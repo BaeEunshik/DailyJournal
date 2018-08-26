@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    android:orientation="vertical"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <!-- MIDDLE -->
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_above="@+id/bottom"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!-- HEADER DATE -->
+        <LinearLayout
+            android:id="@+id/dateBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:id="@+id/textDate"
+                android:textSize="20dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+        <!-- HEADER DATE -->
+
+        <!-- 텍스트 레이아웃 -->
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_below="@id/dateBox"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <!-- textBox -->
+            <LinearLayout
+                android:id="@+id/textBox"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <!-- TextView -->
+                <TextView
+                    android:id="@+id/textContent"
+                    android:textSize="20dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+                <!-- TextView -->
+            </LinearLayout>
+            <!-- textBox -->
+
+            <!-- inputBox -->
+            <LinearLayout
+                android:id="@+id/inputBox"
+                android:visibility="gone"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <!-- EditText -->
+                <EditText
+                    android:id="@+id/inputText"
+                    android:textSize="20dp"
+                    android:hint="글을 입력하세요"
+                    android:background="@null"
+                    android:maxLines="20"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+                <!-- EditText -->
+            </LinearLayout>
+            <!-- inputBox -->
+        </LinearLayout>
+        <!-- 텍스트 레이아웃 -->
+    </LinearLayout>
+    <!-- MIDDLE -->
+
+
+
+<!-- 임시 버튼 -->
+<Button
+    android:id="@+id/btnDelJournal"
+    android:text="삭제"
+    android:layout_alignParentRight="true"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content" />
+<!-- 임시 버튼 -->
+
+
+    <!-- BOTTOM ( 버튼박스 ) -->
+    <LinearLayout
+        android:id="@+id/bottom"
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="50dp">
+        <Button
+            android:id="@+id/btnOpenGallery"
+            android:text="일기 저장하기 - 임시 ( 원 : 사진불러오기 )"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <Button
+            android:text="사진 찍기"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <Button
+            android:text="태그"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+    <!-- BOTTOM ( 버튼박스 ) -->
+
+</RelativeLayout>
