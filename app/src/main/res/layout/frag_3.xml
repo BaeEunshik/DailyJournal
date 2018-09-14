@@ -45,6 +45,15 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
                 <!-- TextView -->
+
+                <!-- 임시 -->
+                <ImageView
+                    android:id="@+id/tmpImg"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_width="150dp"
+                    android:layout_height="100dp" />
+                <!-- 임시 -->
+
             </LinearLayout>
             <!-- textBox -->
 

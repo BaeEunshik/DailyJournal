@@ -1,5 +1,7 @@
 package dmstlr90.co.kr.dailyjournal.fragment;
 
+import android.Manifest;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -11,12 +13,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.gun0912.tedpermission.PermissionListener;
+import com.gun0912.tedpermission.TedPermission;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 
 import butterknife.BindView;
@@ -32,22 +39,22 @@ import dmstlr90.co.kr.dailyjournal.event.F2DataRefresh;
 import dmstlr90.co.kr.dailyjournal.event.JournalToDBEnd;
 import dmstlr90.co.kr.dailyjournal.event.JournalToDBStart;
 import dmstlr90.co.kr.dailyjournal.event.SelectJournalData;
+import dmstlr90.co.kr.dailyjournal.glide.GlideApp;
+import gun0912.tedbottompicker.TedBottomPicker;
 
 //**날짜설정
 //  날짜 설정의 경우 :
-//      1. 첫 ( 오늘자 일기 ) 작성
-//      2. 일기 선택하여 들어온 경우
-//          - 1) F2 에서 이벤트 버스를 사용
-//          - 2) 여기에서 "아이디" or "날짜"를 받아
-//          - 3) 해당 데이터들을 뿌려준다.
+//   1. 첫 ( 오늘자 일기 ) 작성
+//   2. 일기 선택하여 들어온 경우
+//    1) F2 에서 이벤트 버스를 사용
+//    2) 여기에서 "아이디" or "날짜"를 받아
+//    3) 해당 데이터들을 뿌려준다.
 
 // 글을 쓰고 저장된다.
-//      1. 빠져나가는 경우 ( currentPosition 바뀌는 경우 ) 저장되어 db 에 넘어간다.
-
-
-//  *** 일단 구현할 것
-//  1. 빠져나가는 경우 데이터 저장                  [ O ]
-//  2. 다시 오는 경우 오늘 데이터 보여주기 -        [ O ]
+//  1. 빠져나가는 경우 ( currentPosition 바뀌는 경우 ) 저장되어 db 에 넘어간다.
+//  구현)
+//  1) 빠져나가는 경우 데이터 저장                 [ O ]
+//  2) 다시 오는 경우 오늘 데이터 보여주기 -        [ O ]
 
 
 public class Fragment3 extends Fragment{
@@ -77,10 +84,9 @@ public class Fragment3 extends Fragment{
     @BindView(R.id.dateBox)LinearLayout dateBox;
     @BindView(R.id.textBox)LinearLayout textBox;
     @BindView(R.id.inputBox)LinearLayout inputBox;
-
     @BindView(R.id.btnOpenGallery)Button btnOpenGallery;
     @BindView(R.id.btnDelJournal)Button btnDelJournal;
-
+    @BindView(R.id.tmpImg)ImageView tmpImg;
     //AsyncTask
     SaveJournalDBTask saveJournalDBTask;
 
@@ -108,11 +114,10 @@ public class Fragment3 extends Fragment{
         f3Day = getTodayDataInt();  //오늘기준
         initJournal(f3Day);         //전역객체 journal 에 객체 할당 및 View 에 뿌려줌
 
-        //      OnCreateView ( 기본 )
-
+        //    OnCreateView ( 기본 )
         //      이벤트 버스에서 받는다 ( 구현 해야함 )
 
-        //  OnCreateView
+        //    OnCreateView
         //      initJournal( todayInt );
         //      1. 전역 Calendar 에서 얻은 오늘 날짜를 가진 객체를
         //      2. DB 에서 검색한다.
@@ -141,12 +146,12 @@ public class Fragment3 extends Fragment{
     //일기저장 ( 임시 )
     /* 날짜를 텍스트로 입력후 ( ex. 20180727 ) 버튼 클릭시
     *  해당 날짜의 데이터로 " 20180727 의 데이터 " 라는 텍스트 저장 */
-    @OnClick(R.id.btnOpenGallery)
+   /* @OnClick(R.id.btnOpenGallery)
     public void a(){
         String strDate = inputText.getText().toString();
         Integer date = Integer.parseInt(strDate);
         dbManager.insertJournalData(strDate + " 의 데이터 ",date);
-    }
+    }*/
     //일기삭제 ( 임시 )
     /* 날짜를 텍스트로 입력후 ( ex. 20180727 ) 버튼 클릭시
      * 해당 날짜의 일기 데이터 삭제 - 다시 지워야함 */
@@ -162,13 +167,37 @@ public class Fragment3 extends Fragment{
     @OnClick(R.id.textBox)
     public void onClickBtnEdit(View view){
         //  수정 / 작성 ( 활성화 )
-        String str = textContent.getText().toString(); //  1. 텍스트뷰의 텍스트를 가져온다.
-        textBox.setVisibility(View.GONE); //  2. 텍스트 레이아웃을 비활성화 시킨다.
-        inputBox.setVisibility(View.VISIBLE);    //  3. 인풋 레이아웃 활성화 시킨다.
-        inputText.setText(str);   //  4. 에딧텍스트에 셋텍스트 시킨다.
+        String str = textContent.getText().toString();  //  1. 텍스트뷰의 텍스트를 가져온다.
+        textBox.setVisibility(View.GONE);               //  2. 텍스트 레이아웃을 비활성화 시킨다.
+        inputBox.setVisibility(View.VISIBLE);           //  3. 인풋 레이아웃 활성화 시킨다.
+        inputText.setText(str);                         //  4. 에딧텍스트에 셋텍스트 시킨다.
+    }
+    // 사진 불러오기
+    @OnClick(R.id.btnOpenGallery)
+    public void btnOpenGallery(){
+
+        PermissionListener permissionlistener = new PermissionListener() {
+            @Override
+            public void onPermissionGranted() {
+                Toast.makeText(getContext(), "권한 허가", Toast.LENGTH_SHORT).show();
+                startTedBottomPicker();
+            }
+            @Override
+            public void onPermissionDenied(ArrayList<String> deniedPermissions) {
+                Toast.makeText(getContext(), "권한 거부\n" + deniedPermissions.toString(), Toast.LENGTH_SHORT).show();
+            }
+        };
+        TedPermission.with(getContext())
+                .setPermissionListener(permissionlistener)
+                .setRationaleMessage("구글 로그인을 하기 위해서는 주소록 접근 권한이 필요해요")
+                .setDeniedMessage("왜 거부하셨어요...\n하지만 [설정] > [권한] 에서 권한을 허용할 수 있어요.")
+                .setPermissions(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                .check();
     }
 
-    /* ******************* EVT_BUS ******************* */
+// ------------------------------------------------------------------------------
+// -------------------------------- EVT BUS  ------------------------------------
+// ------------------------------------------------------------------------------
     @Subscribe
     public void doSaveJournalAndRefresh(DoSaveJournalAndRefresh evt) {
 
@@ -177,9 +206,8 @@ public class Fragment3 extends Fragment{
              DBTask 가 실행되도록 처리                      */
 
         if(inputBox.getVisibility() == View.VISIBLE){
-            String content = inputText.getText().toString();// 적힌 일기 내용
-            // 일기장에 있는 내용을 조건에 따라 DB에
-            // [ Insert / Update ] 하는 스레드를 실행
+            String content = inputText.getText().toString();            // 적힌 일기 내용
+            // 일기장에 있는 내용을 조건에 따라 DB에 [ Insert / Update ] 하는 스레드를 실행
             saveJournalDBTask = new SaveJournalDBTask(content,f3Day);   //f3Day : 현재 일기의 날짜로 사용할 변수
             saveJournalDBTask.execute();
         }
@@ -193,7 +221,20 @@ public class Fragment3 extends Fragment{
         initJournal(f3Day);
     }
 
-    /* ******************* METHOD ******************* */
+// ------------------------------------------------------------------------------
+// -------------------------------- METHOD  -------------------------------------
+// ------------------------------------------------------------------------------
+    public void startTedBottomPicker(){
+        TedBottomPicker tedBottomPicker = new TedBottomPicker.Builder(getContext())
+                .setOnImageSelectedListener(new TedBottomPicker.OnImageSelectedListener() {
+                    @Override
+                    public void onImageSelected(Uri uri) {
+                        GlideApp.with(getContext()).load(uri).centerCrop().into(tmpImg);
+                    }
+                })
+                .create();
+        tedBottomPicker.show(getFragmentManager());
+    }
     //For Use Correct Journal ( in this Fragment )
     public void initJournal(int day) {
         //  ** 오늘날짜 일기를 작성 후 나갔다 들어왔을 때도 아래 로직을 검사해야 한다. -  F2 로 보내고 Bus 다시 올 때 실행 (????? 구현 안되었나 ?????)
@@ -224,7 +265,9 @@ public class Fragment3 extends Fragment{
         return Integer.parseInt(yearData + monthData + dayData);
     }
 
-    /* ******************* AsyncTask ******************* */
+// ------------------------------------------------------------------------------
+// -------------------------------- AsyncTask  ----------------------------------
+// ------------------------------------------------------------------------------
     // 전역객체에 일기를 할당시키고,
     // View 에 뿌려주는 스레드
     public class GetJournalTask extends AsyncTask<Integer, Integer, Integer>{

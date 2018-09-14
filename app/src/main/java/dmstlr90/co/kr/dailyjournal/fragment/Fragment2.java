@@ -64,7 +64,6 @@ public class Fragment2 extends Fragment{
         bus.register(this);
         //버터나이프
         unbinder = ButterKnife.bind(this, view);
-
         //데이터Set
         refreshBookData();
 
@@ -78,13 +77,9 @@ public class Fragment2 extends Fragment{
         //버터나이프 - unbind
         unbinder.unbind();
     }
-    @Subscribe
-    public void f2F3DataRefresh(F2DataRefresh evt){
-        // F3 에서 일기가 저장이 완료되었다.
-        // 이 저장 정보를 F2 에서 리스트에 반영 시키기 위해 DB 에서 다시 받아온다.
-        // 성능저하 이슈로 다른 로직 ( 다시 받지 않는 ) 작성이 필요하다고 보여진다. ****
-        refreshBookData();
-    }
+// ------------------------------------------------------------------------------
+// -------------------------------- METHOD  -------------------------------------
+// ------------------------------------------------------------------------------
     //데이터 init
     public void refreshBookData(){
         GetCurrBookJournalsTask getCurrBookJournalsTask = new GetCurrBookJournalsTask();
@@ -96,6 +91,10 @@ public class Fragment2 extends Fragment{
         recyclerView.setLayoutManager(layoutManager);
     }
 
+
+// ------------------------------------------------------------------------------
+// -------------------------------- AsyncTask -----------------------------------
+// ------------------------------------------------------------------------------
     //Data get Thread ( refresh 에도 사용 )
     // - 초기 설정되어있는 Book 정보에 의해 ( 기간 ) ** - 나중
     // - 일기를 추려온다.
@@ -123,4 +122,14 @@ public class Fragment2 extends Fragment{
         }
     }
 
+// ------------------------------------------------------------------------------
+// -------------------------------- EVT BUS  ------------------------------------
+// ------------------------------------------------------------------------------
+    @Subscribe
+    public void f2F3DataRefresh(F2DataRefresh evt){
+        // F3 에서 일기가 저장이 완료되었다.
+        // 이 저장 정보를 F2 에서 리스트에 반영 시키기 위해 DB 에서 다시 받아온다.
+        // 성능저하 이슈로 다른 로직 ( 다시 받지 않는 ) 작성이 필요하다고 보여진다. ****
+        refreshBookData();
+    }
 }

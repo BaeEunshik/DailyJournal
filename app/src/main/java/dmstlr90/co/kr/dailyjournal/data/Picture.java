@@ -10,6 +10,6 @@ public class Picture {
     private Integer addr;
     private Integer width;
     private Integer height;
-    private Integer journal_id;
     private Integer date;
+    private Integer journal_id;
 }

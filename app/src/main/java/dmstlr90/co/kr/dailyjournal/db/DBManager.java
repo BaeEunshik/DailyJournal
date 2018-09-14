@@ -54,18 +54,14 @@ public class DBManager extends SQLiteOpenHelper{
     // -------------------------------- GET 함수 ------------------------------------
     // ------------------------------------------------------------------------------
 
-    //F2 의 사진 리스트 생성에 사용하는 함수
+    //F2 의 사진 리스트 생성에 사용
     public ArrayList<Picture> getPictureDataList(){
-        //나중엔 getPictureDataListFromBook 이 되어야 함 ****
+        //TODO: 나중엔 getPictureDataListFromBook 이 되어야 함
 
-        //일기갯수만큼의 Picture 배열을 만든다.
         // 일기의 ID 를 foreignKey 로 가진 이미지를 담는다.
-        // 이미지가 존재하지 않는 경우는 [ date / journal_id ] 만 담고,
-        // 나머지 멤버는 null 로 처리한다.
-
+        // 이미지가 존재하지 않는 경우 객체에 [ date / journal_id ] 만 값을 담고, 객체의 나머지 멤버는 null 로 처리한다.
         ArrayList<Picture> pictures = new ArrayList<>();
         SQLiteDatabase db = getReadableDatabase();
-
 
         String idQuery = "select id, date from Journal;";   //~ where date >= 20180000 and date <= 20189999
         Cursor idCursor = db.rawQuery(idQuery,null);
@@ -73,32 +69,25 @@ public class DBManager extends SQLiteOpenHelper{
         Integer journal_id, date;
         Integer imgId=null, imgAddr=null, imgWidth=null, imgHeight=null;
 
-        //Journal - ID, DATE srch
         while(idCursor.moveToNext()) {
             journal_id = idCursor.getInt(0);
             date = idCursor.getInt(1);
 
-            //ID - Picture srch
             String imgQuery = "select * from Picture where journal_id = '"+journal_id+"';";
             Cursor imgCursor = db.rawQuery(imgQuery,null);
 
             if(imgCursor.moveToNext()){
-
                 imgId = imgCursor.getInt(0);
                 imgAddr = imgCursor.getInt(1);
                 imgWidth = imgCursor.getInt(2);
                 imgHeight = imgCursor.getInt(3);
-
             }
 
-            Picture tmpPic = new Picture(imgId,imgAddr,imgWidth,imgHeight,journal_id,date);
+            Picture tmpPic = new Picture(imgId,imgAddr,imgWidth,imgHeight,date,journal_id);
             pictures.add(tmpPic);
-
             imgCursor.close();
         }
         idCursor.close();
-
-        Log.d("은식 DB - pictures.size",Integer.toString(pictures.size()));
 
         return pictures;
     }

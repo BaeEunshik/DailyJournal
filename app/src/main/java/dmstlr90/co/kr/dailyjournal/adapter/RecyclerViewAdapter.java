@@ -18,10 +18,6 @@ import dmstlr90.co.kr.dailyjournal.bus.BusProvider;
 import dmstlr90.co.kr.dailyjournal.data.Picture;
 import dmstlr90.co.kr.dailyjournal.event.SelectJournalData;
 
-/**
- * Created by Jerry on 12/16/2017.
- */
-
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Holder> {
 
     private ArrayList<Picture> pictures;
@@ -86,7 +82,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         }
 
         //3. 텍스트 적용
-        text.setText(Integer.toString( date ));
+        text.setText(date.toString());
 
         img.setOnClickListener(new View.OnClickListener() {
             @Override
